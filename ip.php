@@ -1,29 +1,19 @@
 <?php
+/**
+ * IP capture endpoint - serves as 1x1 tracking pixel
+ */
+$ip   = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+$ua   = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+$time = date('Y-m-d H:i:s');
 
-if (!empty($_SERVER['HTTP_CLIENT_IP']))
-    {
-      $ipaddress = $_SERVER['HTTP_CLIENT_IP']."\r\n";
-    }
-elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
-    {
-      $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR']."\r\n";
-    }
-else
-    {
-      $ipaddress = $_SERVER['REMOTE_ADDR']."\r\n";
-    }
-$useragent = " User-Agent: ";
-$browser = $_SERVER['HTTP_USER_AGENT'];
+// Save IP
+$entry = "$ip | $time | $ua\n";
+file_put_contents(__DIR__ . '/ip.txt', $entry, FILE_APPEND | LOCK_EX);
 
+// Also save for tracker.sh
+file_put_contents(__DIR__ . '/ip.txt', "IP: $ip\n", LOCK_EX);
 
-$file = 'ip.txt';
-$victim = "IP: ";
-$fp = fopen($file, 'a');
-
-fwrite($fp, $victim);
-fwrite($fp, $ipaddress);
-fwrite($fp, $useragent);
-fwrite($fp, $browser);
-
-
-fclose($fp);
+// Serve a 1x1 transparent GIF
+header('Content-Type: image/gif');
+header('Cache-Control: no-store, no-cache, must-revalidate');
+echo base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');

